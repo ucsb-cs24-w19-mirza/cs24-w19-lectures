@@ -1,0 +1,356 @@
+[dimirza@csil-01 lec-07]$ vim buggy.cpp 
+[dimirza@csil-01 lec-07]$ g++ -g buggy.cpp 
+[dimirza@csil-01 lec-07]$ ls 
+a.out  buggy.cpp
+[dimirza@csil-01 lec-07]$ ./a.out 
+0 10 20 30 40 
+Cleared all the nodes
+0 5 
+Append new nodes
+400 
+[dimirza@csil-01 lec-07]$ vim buggy.cpp 
+[dimirza@csil-01 lec-07]$ vim buggy.cpp 
+[dimirza@csil-01 lec-07]$ g++ -g buggy.cpp 
+[dimirza@csil-01 lec-07]$ gdb ./a.out 
+GNU gdb (GDB) Fedora 8.1.1-3.fc28
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-redhat-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./a.out...done.
+(gdb) r 1 2 3 5
+Starting program: /cs/faculty/dimirza/cs24/cs24-w19-lectures/lec-07/a.out 1 2 3 5
+Missing separate debuginfos, use: dnf debuginfo-install glibc-2.27-37.fc28.x86_64
+0 10 20 30 40 
+Cleared all the nodes
+0 5 
+Append new nodes
+400 
+[Inferior 1 (process 21162) exited normally]
+(gdb) q
+[dimirza@csil-01 lec-07]$ gdb ./a.out 
+GNU gdb (GDB) Fedora 8.1.1-3.fc28
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-redhat-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./a.out...done.
+(gdb) list main
+60		  ll->append(10*i);
+61		delete ll;
+62	
+63	}
+64	
+65	int main(){
+66		//Create an empty list
+67		LinkedList list;//aggregarte initialization
+68		for(int i = 0; i < 5; i++)
+69		  list.append(10*i);
+(gdb) 
+70	
+71		list.print();	
+72		list.clear();
+73		cout<<"Cleared all the nodes"<<endl;
+74	
+75		list.print();	
+76		cout<<"Append new nodes"<<endl;
+77		for(int i = 0; i < 5; i++)
+78		  list.append(100*i);
+79	
+(gdb) b 71
+Breakpoint 1 at 0x400a4b: file buggy.cpp, line 71.
+(gdb) b 73
+Breakpoint 2 at 0x400a63: file buggy.cpp, line 73.
+(gdb) r
+Starting program: /cs/faculty/dimirza/cs24/cs24-w19-lectures/lec-07/a.out 
+Missing separate debuginfos, use: dnf debuginfo-install glibc-2.27-37.fc28.x86_64
+
+Breakpoint 1, main () at buggy.cpp:71
+71		list.print();	
+(gdb) list
+66		//Create an empty list
+67		LinkedList list;//aggregarte initialization
+68		for(int i = 0; i < 5; i++)
+69		  list.append(10*i);
+70	
+71		list.print();	
+72		list.clear();
+73		cout<<"Cleared all the nodes"<<endl;
+74	
+75		list.print();	
+(gdb) info locals
+list = {head = 0x614e70, tail = 0x614ef0}
+(gdb) p head->data
+No symbol "head" in current context.
+(gdb) p list.head
+$1 = (LinkedList::Node *) 0x614e70
+(gdb) p list.head->data
+$2 = 0
+(gdb) p list.head->next->data
+$3 = 10
+(gdb) p list.tail->next->data
+Cannot access memory at address 0x0
+(gdb) list
+76		cout<<"Append new nodes"<<endl;
+77		for(int i = 0; i < 5; i++)
+78		  list.append(100*i);
+79	
+80		list.print();	
+81		//foo();
+82	
+83	}
+(gdb) list 71
+66		//Create an empty list
+67		LinkedList list;//aggregarte initialization
+68		for(int i = 0; i < 5; i++)
+69		  list.append(10*i);
+70	
+71		list.print();	
+72		list.clear();
+73		cout<<"Cleared all the nodes"<<endl;
+74	
+75		list.print();	
+(gdb) n
+0 10 20 30 40 
+72		list.clear();
+(gdb) c
+Continuing.
+
+Breakpoint 2, main () at buggy.cpp:73
+73		cout<<"Cleared all the nodes"<<endl;
+(gdb) info locals
+list = {head = 0x614e70, tail = 0x614ef0}
+(gdb) b clear
+Breakpoint 3 at 0x400962: clear. (15 locations)
+(gdb) b LinkedList::clear
+Note: breakpoint 3 also set at pc 0x400962.
+Breakpoint 4 at 0x400962: file buggy.cpp, line 49.
+(gdb) list 49
+44		}
+45		cout<<endl;
+46	}
+47	void LinkedList::clear(){
+48		//delete all the nodes in the linked list
+49		Node* p = head;
+50		while(p){
+51			Node* tmp = p->next;
+52			delete p;
+53			p = tmp;
+(gdb) b buggy.cpp:LinkedList::clear() 
+Note: breakpoints 3 and 4 also set at pc 0x400962.
+Breakpoint 5 at 0x400962: file buggy.cpp, line 49.
+(gdb) clear 49
+Deleted breakpoints 3 4 5 
+(gdb) b buggy.cpp:LinkedList::clear() 
+Breakpoint 6 at 0x400962: file buggy.cpp, line 49.
+(gdb) c
+Continuing.
+Cleared all the nodes
+0 5 
+Append new nodes
+400 
+[Inferior 1 (process 21406) exited normally]
+(gdb) r
+Starting program: /cs/faculty/dimirza/cs24/cs24-w19-lectures/lec-07/a.out 
+
+Breakpoint 1, main () at buggy.cpp:71
+71		list.print();	
+(gdb) c
+Continuing.
+0 10 20 30 40 
+
+Breakpoint 6, LinkedList::clear (this=0x7fffffffd660) at buggy.cpp:49
+49		Node* p = head;
+(gdb) list main
+60		  ll->append(10*i);
+61		delete ll;
+62	
+63	}
+64	
+65	int main(){
+66		//Create an empty list
+67		LinkedList list;//aggregarte initialization
+68		for(int i = 0; i < 5; i++)
+69		  list.append(10*i);
+(gdb) 
+70	
+71		list.print();	
+72		list.clear();
+73		cout<<"Cleared all the nodes"<<endl;
+74	
+75		list.print();	
+76		cout<<"Append new nodes"<<endl;
+77		for(int i = 0; i < 5; i++)
+78		  list.append(100*i);
+79	
+(gdb) r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+Starting program: /cs/faculty/dimirza/cs24/cs24-w19-lectures/lec-07/a.out 
+
+Breakpoint 1, main () at buggy.cpp:71
+71		list.print();	
+(gdb) c
+Continuing.
+0 10 20 30 40 
+
+Breakpoint 6, LinkedList::clear (this=0x7fffffffd660) at buggy.cpp:49
+49		Node* p = head;
+(gdb) l
+44		}
+45		cout<<endl;
+46	}
+47	void LinkedList::clear(){
+48		//delete all the nodes in the linked list
+49		Node* p = head;
+50		while(p){
+51			Node* tmp = p->next;
+52			delete p;
+53			p = tmp;
+(gdb) 
+54		}
+55	
+56	}
+57	void foo(){
+58		LinkedList* ll= new LinkedList;
+59		for(int i = 0; i < 5; i++)
+60		  ll->append(10*i);
+61		delete ll;
+62	
+63	}
+(gdb) b 54
+Breakpoint 7 at 0x40099b: file buggy.cpp, line 54.
+(gdb) c
+Continuing.
+
+Breakpoint 7, LinkedList::clear (this=0x7fffffffd660) at buggy.cpp:56
+56	}
+(gdb) p head
+$4 = (LinkedList::Node *) 0x614e70
+(gdb) list p
+Function "p" not defined.
+(gdb) info locals
+p = 0x0
+(gdb) p p
+$5 = (LinkedList::Node *) 0x0
+(gdb) p head
+$6 = (LinkedList::Node *) 0x614e70
+(gdb) p tail
+$7 = (LinkedList::Node *) 0x614ef0
+(gdb) list LinkedList::clear() 
+42			cout<<p->data<<" ";
+43			p = p->next;
+44		}
+45		cout<<endl;
+46	}
+47	void LinkedList::clear(){
+48		//delete all the nodes in the linked list
+49		Node* p = head;
+50		while(p){
+51			Node* tmp = p->next;
+(gdb) l
+52			delete p;
+53			p = tmp;
+54		}
+55	
+56	}
+57	void foo(){
+58		LinkedList* ll= new LinkedList;
+59		for(int i = 0; i < 5; i++)
+60		  ll->append(10*i);
+61		delete ll;
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [process 22211] will be killed.
+
+Quit anyway? (y or n) y
+[dimirza@csil-01 lec-07]$ vim buggy.cpp 
+[dimirza@csil-01 lec-07]$ g++ -g buggy.cpp 
+[dimirza@csil-01 lec-07]$ ./.
+-bash: ./.: Is a directory
+[dimirza@csil-01 lec-07]$ ./a.out 
+0 10 20 30 40 
+free(): double free detected in tcache 2
+Aborted (core dumped)
+[dimirza@csil-01 lec-07]$ gdb ./a.out 
+GNU gdb (GDB) Fedora 8.1.1-3.fc28
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-redhat-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./a.out...done.
+(gdb) r
+Starting program: /cs/faculty/dimirza/cs24/cs24-w19-lectures/lec-07/a.out 
+Missing separate debuginfos, use: dnf debuginfo-install glibc-2.27-37.fc28.x86_64
+0 10 20 30 40 
+free(): double free detected in tcache 2
+
+Program received signal SIGABRT, Aborted.
+0x00007ffff710eeab in raise () from /lib64/libc.so.6
+(gdb) bt
+#0  0x00007ffff710eeab in raise () from /lib64/libc.so.6
+#1  0x00007ffff70f95b9 in abort () from /lib64/libc.so.6
+#2  0x00007ffff7151777 in __libc_message () from /lib64/libc.so.6
+#3  0x00007ffff7157c0c in malloc_printerr () from /lib64/libc.so.6
+#4  0x00007ffff7159675 in _int_free () from /lib64/libc.so.6
+#5  0x00000000004009af in LinkedList::clear (this=0x7fffffffd660)
+    at buggy.cpp:55
+#6  0x0000000000400a77 in main () at buggy.cpp:73
+(gdb) up 5
+#5  0x00000000004009af in LinkedList::clear (this=0x7fffffffd660)
+    at buggy.cpp:55
+55		delete head;
+(gdb) list
+50		while(p){
+51			Node* tmp = p->next;
+52			delete p;
+53			p = tmp;
+54		}
+55		delete head;
+56	
+57	}
+58	void foo(){
+59		LinkedList* ll= new LinkedList;
+(gdb) info locals
+p = 0x0
+(gdb) p tmp
+No symbol "tmp" in current context.
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [process 22725] will be killed.
+
+Quit anyway? (y or n) y
+[dimirza@csil-01 lec-07]$ ls
+a.out  buggy.cpp
+[dimirza@csil-01 lec-07]$ vim BST.cpp
+[dimirza@csil-01 lec-07]$ vim BST.cpp
+[dimirza@csil-01 lec-07]$ 
