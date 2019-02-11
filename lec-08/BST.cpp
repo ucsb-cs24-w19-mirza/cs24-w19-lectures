@@ -1,16 +1,11 @@
-class BST{
-	public:
-		bool search(int value) const;
-		int min() const;
-		bool insert(int value);
+#include "BST.h"
 
-	private:
-		class BSTNode{
-			public:
-				 int data;
-				 BSTNode* left;
-				 BSTNode* right;
- 				 BSTNode* parent;
-		};
-		BSTNode* root;
-};
+bool BST::search(int value) const{
+	return true;
+}
+int BST::min() const{	
+	return 42;
+}
+bool BST::insert(int value){
+	return true;
+}
