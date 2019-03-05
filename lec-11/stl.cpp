@@ -50,7 +50,6 @@ int main(){
 	stack<array<int,2>> minStack;
     array<int,2> item1= {42, 42};
 	minStack.push(item1);
-	
 
 
 	return 0;
